@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+  cddb_mysql:
+    image: mysql
+    ports: 
+      - 23306:3306
+    environment: 
+        MYSQL_ROOT_PASSWORD: quintor_pw
+        MYSQL_DATABASE: cddb_quintor
+        MYSQL_USER: cddb_quintor
+        MYSQL_PASSWORD: quintor_pw
+
+  cddb_backend:
+    container_name: cddb_backend
+    build: ./backend
+    ports: 
+      - 28080:8080
+    depends_on:
+      - cddb_mysql
+    links: 
+      - cddb_mysql:mysql
+    environment:
+      DATABASE_HOST: cddb_mysql
+      DATABASE_USER: cddb_quintor
+      DATABASE_PASSWORD: quintor_pw
+      DATABASE_PORT: 23306
+
+  cddb_frontend:
+    container_name: cddb_frontend
+    build: ./frontend
+    ports:
+      - 20080:80
+    depends_on:
+      - cddb_backend:tomcat
+    links:
+      - cddb_backend
